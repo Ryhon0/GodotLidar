@@ -1,0 +1,51 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Objects/Player/Player.cs" type="Script" id=1]
+[ext_resource path="res://dot.png" type="Texture" id=2]
+
+[sub_resource type="SpatialMaterial" id=4]
+flags_transparent = true
+flags_no_depth_test = true
+vertex_color_use_as_albedo = true
+params_blend_mode = 1
+params_billboard_mode = 1
+albedo_texture = ExtResource( 2 )
+
+[sub_resource type="QuadMesh" id=5]
+material = SubResource( 4 )
+size = Vector2( 0.02, 0.02 )
+
+[sub_resource type="MultiMesh" id=3]
+color_format = 2
+transform_format = 1
+visible_instance_count = 0
+mesh = SubResource( 5 )
+
+[sub_resource type="CapsuleShape" id=1]
+margin = 0.1
+radius = 0.5
+height = 0.7
+
+[node name="Player" type="KinematicBody"]
+script = ExtResource( 1 )
+LidarRayPath = NodePath("Head/LidarRay")
+PointsPath = NodePath("Points")
+CameraPath = NodePath("Head/Camera")
+
+[node name="Points" type="MultiMeshInstance" parent="."]
+layers = 2
+multimesh = SubResource( 3 )
+
+[node name="Collision" type="CollisionShape" parent="."]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.85, 0 )
+shape = SubResource( 1 )
+
+[node name="Head" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0 )
+
+[node name="Camera" type="Camera" parent="Head"]
+cull_mask = 1048574
+current = true
+fov = 90.0
+
+[node name="LidarRay" type="Spatial" parent="Head"]

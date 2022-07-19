@@ -1,0 +1,18 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build",
+			"command": "/opt/godot-mono-bin/godot/Godot_v3.4.4-stable_mono_x11.64",
+			"type": "process",
+			"args": [
+				"--build-solutions",
+				"--path",
+				"${workspaceRoot}",
+				"--no-window",
+				"-q"
+			],
+			"problemMatcher": "$msCompile"
+		}
+	]
+}
