@@ -9,8 +9,6 @@ public partial class Player : KinematicBody
 	[OnReadyGet]
 	Spatial LidarRay;
 	[OnReadyGet]
-	MultiMeshInstance Points;
-	[OnReadyGet]
 	Camera Camera;
 
 	float MoveSpeed = 7f;
@@ -39,11 +37,9 @@ public partial class Player : KinematicBody
 	void Ready()
 	{
 		Input.SetMouseMode(Input.MouseMode.Captured);
-		OS.WindowFullscreen = true;
-
-		Points.SetAsToplevel(true);
-		Points.GlobalTransform = new Transform(Basis.Identity, Vector3.Zero);
-		Points.Multimesh.InstanceCount = 1_000_000;
+#if (!DEBUG)
+			OS.WindowFullscreen = true;
+#endif
 
 		FullScan();
 	}
@@ -57,12 +53,6 @@ public partial class Player : KinematicBody
 		var v = Input.GetActionStrength("look_up") - Input.GetActionStrength("look_dw");
 		RotateCamera(h * JoystickSensitivity, v * -JoystickSensitivity);
 
-		if (Input.IsActionPressed("attack1"))
-			CircleScan(delta);
-
-		if (Input.IsActionJustPressed("attack2"))
-			FullScan();
-
 		float angleStep = 2f;
 		if (Input.IsActionJustReleased("scan_size_up"))
 			MaxRandomRotation -= angleStep;
@@ -71,10 +61,7 @@ public partial class Player : KinematicBody
 		MaxRandomRotation = Mathf.Clamp(MaxRandomRotation, 2, 90);
 
 		if (Input.IsActionJustPressed("restart"))
-		{
-			curentMesh = 0;
-			Points.Multimesh.VisibleInstanceCount = 0;
-		}
+			RemoveLIDARMeshes();
 
 		if (Input.IsActionJustPressed("toggle_camera"))
 		{
@@ -82,100 +69,10 @@ public partial class Player : KinematicBody
 		}
 	}
 
-	[Export]
-	float MaxRandomRotation = 10;
-	void CircleScan(float delta)
-	{
-		if(scanning) return;
-
-		int pps = 150;
-		int ps = (int)(pps * delta);
-
-		Random rand = new Random();
-
-		for (int i = 0; i < ps; i++)
-		{
-			Vector2 rv = new Vector2(
-				(float)rand.NextDouble().Remap(0, 1, -1, 1),
-				(float)rand.NextDouble().Remap(0, 1, -1, 1)
-				).Normalized() * (float)rand.NextDouble();
-			rv *= MaxRandomRotation;
-
-			LidarRay.RotationDegrees = new Vector3(rv.x, rv.y, 0);
-
-			var start = LidarRay.GlobalTransform.origin;
-			var end = start + (-LidarRay.GlobalTransform.basis.z * 200);
-
-			PutPoint(start, end);
-		}
-	}
-
-	[Export]
-	int fullScanSize = 150;
-	bool scanning = false;
-	async void FullScan()
-	{
-		if(scanning) return;
-
-		scanning = true;
-		for (int y = 0; y < fullScanSize; y++)
-		{
-			for (int x = 0; x < fullScanSize; x++)
-			{
-				Vector2 screenpos = new Vector2(
-					x / (float)fullScanSize,
-					y / (float)fullScanSize
-				);
-				screenpos *= GetTree().Root.Size;
-
-				var start = Camera.ProjectRayOrigin(screenpos);
-				var end = start + (Camera.ProjectRayNormal(screenpos) * 2000);
-
-				PutPoint(start, end);
-			}
-			await ToSignal(GetTree(), "idle_frame");
-		}
-		scanning = false;
-	}
-
-	int curentMesh = 0;
-	void PutPoint(Vector3 start, Vector3 end)
-	{
-		var spaceState = GetWorld().DirectSpaceState;
-
-		var col = spaceState.IntersectRay(start, end, null, 1, true, false);
-
-		if (col != null && col.Count > 0)
-		{
-			var hit = (Vector3)col["position"];
-			var body = (Spatial)col["collider"];
-
-			Transform trans = new Transform(Basis.Identity, hit);
-
-			Points.Multimesh.SetInstanceTransform(curentMesh, trans);
-			bool isEnemy = body.IsInGroup("Enemy");
-			
-			Color clr = isEnemy ? new Color(1, 0, 0) : new Color(0.2f,0.2f,0.2f);
-			// Random color offset
-			Random rand = new Random();
-			const double maxOffset = 0.025;
-			clr += new Color(
-				(float)rand.NextDouble().Remap(0,1,-maxOffset, maxOffset),
-				(float)rand.NextDouble().Remap(0,1,-maxOffset, maxOffset),
-				(float)rand.NextDouble().Remap(0,1,-maxOffset, maxOffset)
-				);
-
-			Points.Multimesh.SetInstanceColor(curentMesh, clr);
-
-			Points.Multimesh.VisibleInstanceCount = Mathf.Max(curentMesh + 1, Points.Multimesh.VisibleInstanceCount);
-
-			if (curentMesh >= Points.Multimesh.InstanceCount - 1) curentMesh = 0;
-			else curentMesh++;
-		}
-	}
-
 	public override void _PhysicsProcess(float delta)
 	{
+		PhysicsLidar(delta);
+
 		Direction = Vector3.Zero;
 
 		InAir = !IsOnFloor();
