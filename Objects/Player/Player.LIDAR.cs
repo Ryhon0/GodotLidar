@@ -105,6 +105,8 @@ public partial class Player
 			var hit = (Vector3)col["position"];
 			var body = (Spatial)col["collider"];
 
+			if (body is IScannable sc) sc.OnScan(start, hit);
+
 			Transform trans = new Transform(Basis.Identity, hit);
 
 			bool isEnemy = body.IsInGroup("Enemy");
