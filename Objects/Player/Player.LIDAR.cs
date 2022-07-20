@@ -59,12 +59,14 @@ public partial class Player
 	[Export]
 	float MaxRandomRotation = 10;
 	[Export]
-	int PointPerSecond = 250;
+	int PointPerSecond = 2000;
+	[OnReadyGet]
+	Spatial LidarRay;
 	void CircleScan(float delta)
 	{
 		if (scanning) return;
 
-		int ps = (int)(PointPerSecond * delta);
+		int ps = Mathf.CeilToInt(PointPerSecond * delta);
 
 		Random rand = new Random();
 
@@ -72,8 +74,10 @@ public partial class Player
 		{
 			Vector2 rv = new Vector2(
 				(float)rand.NextDouble().Remap(0, 1, -1, 1),
-				(float)rand.NextDouble().Remap(0, 1, -1, 1)
-				).Normalized() * (float)rand.NextDouble();
+				(float)rand.NextDouble().Remap(0, 1, -1, 1));
+
+			if (rv.Length() > 1) rv = rv.Normalized();
+
 			rv *= MaxRandomRotation;
 
 			LidarRay.RotationDegrees = new Vector3(rv.x, rv.y, 0);
@@ -86,7 +90,7 @@ public partial class Player
 	}
 
 	[Export]
-	int fullScanSize = 75;
+	int fullScanSize = 100;
 	bool scanning = false;
 	async void FullScan()
 	{
@@ -94,6 +98,10 @@ public partial class Player
 		scanning = true;
 	}
 
+	[Export]
+	Color PointColor;
+	[Export]
+	Color EnemyColor;
 	void PutPoint(Vector3 start, Vector3 end)
 	{
 		var spaceState = GetWorld().DirectSpaceState;
@@ -116,10 +124,10 @@ public partial class Player
 
 			bool isEnemy = body.IsInGroup("Enemy");
 
-			Color clr = isEnemy ? new Color(1, 0, 0) : new Color(0.2f, 0.2f, 0.2f);
+			Color clr = isEnemy ? EnemyColor : PointColor;
 			// Random color offset
 			Random rand = new Random();
-			const double maxOffset = 0.025;
+			const double maxOffset = 0.2;
 			clr += new Color(
 				(float)rand.NextDouble().Remap(0, 1, -maxOffset, maxOffset),
 				(float)rand.NextDouble().Remap(0, 1, -maxOffset, maxOffset),
@@ -152,9 +160,9 @@ public partial class Player
 		else
 		{
 			int pointcount = Mathf.CeilToInt(PointPerSecond * delta);
-			pointcount *= 15;
+			pointcount *= 5;
 
-			for(int i=0; i<pointcount; i++)
+			for (int i = 0; i < pointcount; i++)
 			{
 				int y = (fullScanProgress + i) / fullScanSize;
 				int x = (fullScanProgress + i) % fullScanSize;
@@ -164,6 +172,10 @@ public partial class Player
 					y / (float)fullScanSize
 				);
 				screenpos *= GetTree().Root.Size;
+				Random rand = new Random();
+				screenpos += new Vector2(
+					(float)rand.NextDouble().Remap(0, 1, -2, 2),
+					(float)rand.NextDouble().Remap(0, 1, -2, 2));
 
 				var start = Camera.ProjectRayOrigin(screenpos);
 				var end = start + (Camera.ProjectRayNormal(screenpos) * 2000);
@@ -172,7 +184,7 @@ public partial class Player
 			}
 
 			fullScanProgress += pointcount;
-			if(fullScanProgress >= fullScanSize * fullScanSize)
+			if (fullScanProgress >= fullScanSize * fullScanSize)
 			{
 				fullScanProgress = 0;
 				scanning = false;

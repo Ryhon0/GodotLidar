@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=2]
+[gd_scene load_steps=41 format=2]
 
 [ext_resource path="res://Objects/Player/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Assets/Textures/Test/test.png" type="Texture" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://Assets/Textures/Test/test_white.png" type="Texture" id=6]
 [ext_resource path="res://Assets/Models/Player/Body.material" type="Material" id=7]
 [ext_resource path="res://Assets/Models/Logo/logo.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Objects/Scannable/ScannableObject.cs" type="Script" id=9]
 
 [sub_resource type="SpatialMaterial" id=1]
 flags_ensure_correct_normals = true
@@ -293,12 +294,6 @@ operation = 2
 use_collision = true
 mesh = SubResource( 25 )
 
-[node name="Window" type="CSGMesh" parent="Meshes/Building"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9, -4.25, -3 )
-operation = 2
-use_collision = true
-mesh = SubResource( 31 )
-
 [node name="Window2" type="CSGMesh" parent="Meshes/Building"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9, -4.25, 1 )
 operation = 2
@@ -359,5 +354,36 @@ shape = SubResource( 21 )
 [node name="CollisionShape" type="CollisionShape" parent="Enemy"]
 shape = SubResource( 22 )
 
+[node name="Enemy2" type="StaticBody" parent="." groups=["Skip"]]
+transform = Transform( -0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, -0.965926, 11.7265, 1, 3.84817 )
+script = ExtResource( 9 )
+
+[node name="DeleteTimer" type="Timer" parent="Enemy2"]
+one_shot = true
+
+[node name="Avatar" type="MeshInstance" parent="Enemy2"]
+mesh = SubResource( 16 )
+skin = SubResource( 17 )
+skeleton = NodePath("")
+material/0 = null
+
+[node name="CollisionShape5" type="CollisionShape" parent="Enemy2"]
+shape = SubResource( 18 )
+
+[node name="CollisionShape4" type="CollisionShape" parent="Enemy2"]
+shape = SubResource( 19 )
+
+[node name="CollisionShape3" type="CollisionShape" parent="Enemy2"]
+shape = SubResource( 20 )
+
+[node name="CollisionShape2" type="CollisionShape" parent="Enemy2"]
+shape = SubResource( 21 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Enemy2"]
+shape = SubResource( 22 )
+
 [node name="logo" parent="." instance=ExtResource( 8 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.953979, 1.61324, -26.1216 )
+
+[connection signal="Scanned" from="Enemy2" to="Enemy2/DeleteTimer" method="start" flags=6 binds= [ 2.0 ]]
+[connection signal="timeout" from="Enemy2/DeleteTimer" to="Enemy2" method="queue_free"]

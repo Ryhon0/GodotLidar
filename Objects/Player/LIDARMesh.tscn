@@ -6,13 +6,17 @@
 flags_transparent = true
 flags_no_depth_test = true
 vertex_color_use_as_albedo = true
+params_specular_mode = 4
 params_blend_mode = 1
+params_depth_draw_mode = 2
 params_billboard_mode = 1
 albedo_texture = ExtResource( 1 )
+proximity_fade_enable = true
+proximity_fade_distance = 0.0
 
 [sub_resource type="QuadMesh" id=5]
 material = SubResource( 4 )
-size = Vector2( 0.05, 0.05 )
+size = Vector2( 0.02, 0.02 )
 
 [sub_resource type="MultiMesh" id=3]
 color_format = 2
@@ -21,5 +25,6 @@ visible_instance_count = 0
 mesh = SubResource( 5 )
 
 [node name="Points" type="MultiMeshInstance"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0111607, 0 )
 layers = 2
 multimesh = SubResource( 3 )

@@ -11,10 +11,10 @@ public partial class Player : KinematicBody
 	[OnReadyGet]
 	Camera Camera;
 
-	float MoveSpeed = 7f;
+	float MoveSpeed = 4f;
 	float Acceleration;
 	float Gravity = 17.6f;
-	float JumpHeight = 6;
+	float JumpHeight = 5.75f;
 	float AirAcceleration = 1;
 	float FloorAcceleration = 5;
 
