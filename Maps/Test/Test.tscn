@@ -385,5 +385,5 @@ shape = SubResource( 22 )
 [node name="logo" parent="." instance=ExtResource( 8 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.953979, 1.61324, -26.1216 )
 
-[connection signal="Scanned" from="Enemy2" to="Enemy2/DeleteTimer" method="start" flags=6 binds= [ 2.0 ]]
+[connection signal="Scanned" from="Enemy2" to="Enemy2/DeleteTimer" method="start" flags=6 binds= [ 1.5 ]]
 [connection signal="timeout" from="Enemy2/DeleteTimer" to="Enemy2" method="queue_free"]
