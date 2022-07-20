@@ -312,7 +312,7 @@ use_collision = true
 mesh = SubResource( 31 )
 
 [node name="Room" type="CSGMesh" parent="Meshes/Building"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -4.5, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4.1, -4.5, 0 )
 operation = 2
 use_collision = true
 mesh = SubResource( 26 )
