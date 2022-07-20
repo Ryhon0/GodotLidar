@@ -119,7 +119,11 @@ public partial class Player : KinematicBody
 				Velocity = Vector3.Zero;
 		}
 
-		Velocity = Velocity.LinearInterpolate(Direction * MoveSpeed, Acceleration * delta);
+		var acutalSepeed = Input.IsActionPressed("attack1") || scanning ?
+			MoveSpeed / 3 :
+			MoveSpeed;
+
+		Velocity = Velocity.LinearInterpolate(Direction * acutalSepeed, Acceleration * delta);
 
 		if (IsOnFloor() && !InAir || IsOnCeiling() && InAir) GravityVector = Vector3.Zero;
 		else GravityVector.y -= Gravity * delta;
