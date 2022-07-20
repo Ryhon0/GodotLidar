@@ -237,6 +237,12 @@ public partial class Player : KinematicBody
 		{
 			RotateCamera(m.Relative.x * MouseSensitivity, m.Relative.y * MouseSensitivity);
 		}
+
+		if (OS.GetName() == "HTML5" && @event is InputEventMouseButton mb)
+		{
+			OS.WindowFullscreen = true;
+			Input.SetMouseMode(Input.MouseMode.Captured);
+		}
 	}
 
 	void RotateCamera(float h, float v)
