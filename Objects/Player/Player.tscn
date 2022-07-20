@@ -1,19 +1,32 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Objects/Player/Player.cs" type="Script" id=1]
 [ext_resource path="res://Objects/Player/LIDARMesh.tscn" type="PackedScene" id=2]
+[ext_resource path="res://UI/MobileControls/MobileControls.tscn" type="PackedScene" id=3]
 
 [sub_resource type="CapsuleShape" id=1]
 margin = 0.1
 radius = 0.5
 height = 0.7
 
+[sub_resource type="CubeMesh" id=2]
+size = Vector3( 0.1, 0.1, 0.25 )
+
+[sub_resource type="SpatialMaterial" id=3]
+flags_transparent = true
+albedo_color = Color( 1, 0, 0, 0.5 )
+
 [node name="Player" type="KinematicBody"]
 script = ExtResource( 1 )
-LidarRayPath = NodePath("Head/LidarRay")
+HeadPath = NodePath("Head")
+HandPath = NodePath("Head/Hand")
 CameraPath = NodePath("Head/Camera")
 LIDARContainerPath = NodePath("LIDARContainer")
+LidarRayPath = NodePath("Head/LidarRay")
+LinesPath = NodePath("Head/Hand/Scanner/Lines")
 LIDARMeshScene = ExtResource( 2 )
+PointColor = Color( 1, 0.945098, 0.368627, 1 )
+EnemyColor = Color( 1, 0, 0, 1 )
 
 [node name="LIDARContainer" type="Spatial" parent="."]
 
@@ -36,3 +49,21 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="LidarRay" type="Spatial" parent="Head"]
+
+[node name="Hand" type="Spatial" parent="Head"]
+
+[node name="Scanner" type="MeshInstance" parent="Head/Hand"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.154, -0.234, -0.338 )
+layers = 3
+mesh = SubResource( 2 )
+skeleton = NodePath("../..")
+material/0 = null
+
+[node name="Lines" type="ImmediateGeometry" parent="Head/Hand/Scanner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.13738 )
+layers = 3
+material_override = SubResource( 3 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MobileControls" parent="CanvasLayer" instance=ExtResource( 3 )]

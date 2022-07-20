@@ -109,6 +109,9 @@ public partial class Player
 
 			if (body.IsInGroup("Skip")) return;
 
+			Lines.AddVertex(Vector3.Zero);
+			Lines.AddVertex(Lines.ToLocal(hit));
+
 			Transform trans = new Transform(Basis.Identity, hit);
 
 			bool isEnemy = body.IsInGroup("Enemy");
@@ -131,9 +134,14 @@ public partial class Player
 		}
 	}
 
+	[OnReadyGet]
+	ImmediateGeometry Lines;
+
 	int fullScanProgress = 0;
 	void PhysicsLidar(float delta)
 	{
+		Lines.Clear();
+		Lines.Begin(Mesh.PrimitiveType.Lines);
 		if (!scanning)
 		{
 			if (Input.IsActionPressed("attack1"))
@@ -170,5 +178,6 @@ public partial class Player
 				scanning = false;
 			}
 		}
+		Lines.End();
 	}
 }

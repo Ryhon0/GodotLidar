@@ -4,10 +4,10 @@ using GodotOnReady.Attributes;
 
 public partial class Player : KinematicBody
 {
-	[OnReadyGet("Head")]
+	[OnReadyGet]
 	public Spatial Head;
 	[OnReadyGet]
-	Spatial LidarRay;
+	Spatial Hand;
 	[OnReadyGet]
 	Camera Camera;
 
@@ -23,7 +23,7 @@ public partial class Player : KinematicBody
 	bool StopMomentum = true;
 	float MaxSlopeAngle = 20;
 	bool GroundContact = false;
-	float ViewmodelSway = 1;
+	float ViewmodelSway = 2f;
 	bool InAir = false;
 
 	public Vector3 Direction;
@@ -59,6 +59,13 @@ public partial class Player : KinematicBody
 		else if (Input.IsActionJustReleased("scan_size_down")) MaxRandomRotation += angleStep;
 
 		MaxRandomRotation = Mathf.Clamp(MaxRandomRotation, 2, 90);
+
+		Hand.Rotation = new Vector3(
+			Mathf.LerpAngle(Hand.Rotation.x, 0, ViewmodelSway * delta * 10),
+			Mathf.LerpAngle(Hand.Rotation.y, 0, ViewmodelSway * delta * 10),
+			0);
+
+		Lines.Rotation = -Hand.Rotation;
 
 		if (Input.IsActionJustPressed("restart"))
 			RemoveLIDARMeshes();
@@ -145,6 +152,12 @@ public partial class Player : KinematicBody
 	void RotateCamera(float h, float v)
 	{
 		RotateY(Mathf.Deg2Rad(-h));
+
+		Hand.Rotation = new Vector3(
+			Mathf.Clamp(Hand.Rotation.x + Mathf.Deg2Rad(v / 5) * ViewmodelSway, Mathf.Deg2Rad(-15), Mathf.Deg2Rad(15)),
+			Mathf.Clamp(Hand.Rotation.y + Mathf.Deg2Rad(h / 5) * ViewmodelSway, Mathf.Deg2Rad(-15), Mathf.Deg2Rad(15)), 0);
+
+		Lines.Rotation = -Hand.Rotation;
 
 		Head.Rotation = new Vector3(Mathf.Clamp(Head.Rotation.x - Mathf.Deg2Rad(v), Mathf.Deg2Rad(-89), Mathf.Deg2Rad(89)),
 			Head.Rotation.y, Head.Rotation.z);
