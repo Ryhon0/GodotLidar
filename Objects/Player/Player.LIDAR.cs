@@ -107,6 +107,8 @@ public partial class Player
 
 			if (body is IScannable sc) sc.OnScan(start, hit);
 
+			if (body.IsInGroup("Skip")) return;
+
 			Transform trans = new Transform(Basis.Identity, hit);
 
 			bool isEnemy = body.IsInGroup("Enemy");
